@@ -1,9 +1,0 @@
-{
-  "name":"Gaara RPG",
-  "short_name":"Gaara RPG",
-  "start_url":"/",
-  "display":"standalone",
-  "background_color":"#15120f",
-  "theme_color":"#211b16",
-  "description":"RPG narrativo privado de Saruto e Gaara"
-}
