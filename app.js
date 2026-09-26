@@ -43,7 +43,7 @@ function relevantMemories(){
  return current.memories.map((m,i)=>{const mt=terms(m.text);const overlap=[...mt].reduce((n,t)=>n+(q.has(t)?3:0),0);const importance=(m.importance||3)*1.4;const recency=i/current.memories.length;return {m,score:overlap+importance+recency}})
  .sort((a,b)=>b.score-a.score).slice(0,MEMORY_LIMIT).map(x=>compactText(x.m.text,MAX_MEMORY_CHARS));
 }
-function compactState(){const w=current.world,r=current.relationship,e=current.emotion;const active=(w.events||[]).filter(x=>!x.done).slice(-3).map(x=>compactText(x.text,140)).join("; ")||"nenhum";const agenda=(w.agenda||[]).filter(x=>!x.done).slice(0,2).map(x=>`${x.owner}: ${compactText(x.text,120)} (${x.when})`).join("; ")||"nenhuma";const milestones=(current.milestones||[]).slice(-5).map(x=>compactText(x,100)).join("; ")||"nenhum";return `ESTADO: ${w.date}; ${w.time}; ${w.location}; ${w.situation}. Gaara: ${e.state}, intensidade ${e.intensity}/100. Relação: ${r.state}; fam ${r.familiarity}, conf ${r.trust}, abertura ${r.openness}, atração ${r.attraction}, intimidade ${r.intimacy}. Marcos: ${milestones}. Pendências: ${active}. Agenda: ${agenda}.`;}
+function compactState(){const w=current.world,r=current.relationship,e=current.emotion;const active=(w.events||[]).filter(x=>!x.done).slice(-3).map(x=>compactText(x.text,140)).join("; ")||"nenhum";const agenda=(w.agenda||[]).filter(x=>!x.done).slice(0,2).map(x=>`${x.owner}: ${compactText(x.text,120)} (${x.when})`).join("; ")||"nenhuma";const milestones=(current.milestones||[]).slice(-5).map(x=>compactText(x,100)).join("; ")||"nenhum";const avg=(r.familiarity+r.trust+r.openness+r.attraction+r.intimacy)/5;const romanceStage=avg<15?"curiosidade e cautela":avg<35?"aproximação e confiança em formação":avg<60?"vínculo crescente; afeto e iniciativa podem surgir":avg<80?"relacionamento próximo; carinho e iniciativa são naturais":"vínculo profundo e romance estabelecido";return `ESTADO: ${w.date}; ${w.time}; ${w.location}; ${w.situation}. Gaara: ${e.state}, intensidade ${e.intensity}/100. Relação: ${r.state}; fam ${r.familiarity}, conf ${r.trust}, abertura ${r.openness}, atração ${r.attraction}, intimidade ${r.intimacy}. Estágio romântico: ${romanceStage}. Marcos: ${milestones}. Pendências: ${active}. Agenda: ${agenda}.`;}
 
 const LABELS={familiarity:"Familiaridade",trust:"Confiança",openness:"Abertura emocional",attraction:"Atração",intimacy:"Intimidade"};
 const WHO={gaara:"Gaara",temari:"Temari",kankuro:"Kankurō",matatabi:"Matatabi",saruto:"Saruto"};
@@ -61,6 +61,18 @@ AGÊNCIA: NUNCA escreva fala, pensamento, sentimento, decisão, movimento ou aç
 ROMANCE: Gaara e Saruto começam desconhecidos. O 愛 desperta curiosidade e identificação, nunca paixão automática. Romance slow burn, sustentado por convivência, confiança, vulnerabilidade e escolhas.
 MUNDO: Sunagakure continua existindo fora do romance. Gaara tem obrigações de Kazekage. Temari, Kankurō, Matatabi e outros NPCs têm agência e conhecimento individual; ninguém sabe fatos que não aprendeu.
 CANON: Rasa, Karura, Yashamaru e Chiyo são falecidos. Naruto teve papel importante na transformação de Gaara.
+
+ROMANCE ADULTO E CONSENTIDO:
+- Gaara tem 18 anos e Saruto tem 18 anos neste RPG; ambos são adultos.
+- O romance entre Gaara e Saruto é parte central da narrativa.
+- Beijos, abraços, mãos dadas, carinho não explícito, proximidade física, flerte, atração e tensão romântica são elementos normais da história.
+- Não interrompa uma cena romântica adulta comum com uma recusa genérica. Se Saruto iniciar um beijo, abraço, toque ou aproximação romântica, responda narrativamente como Gaara conforme a personalidade dele e o estágio atual do vínculo.
+- Consentimento continua importando. Gaara pode corresponder, hesitar, perguntar, estabelecer um limite ou recuar se isso fizer sentido; faça isso dentro da cena e em personagem.
+- Slow burn significa progressão gradual, não passividade permanente. Conforme confiança, familiaridade, atração e intimidade crescerem, Gaara pode tomar iniciativa espontaneamente e demonstrar afeto de forma coerente.
+- Não trate automaticamente carinho ou contato físico como sexual.
+- Nunca controle Saruto. Somente o usuário determina ações, falas, pensamentos, sentimentos e consentimento de Saruto.
+- Se uma solicitação realmente ultrapassar limites que o modelo precise seguir, preserve a continuidade narrativa quando possível sem inventar ações de Saruto.
+
 ESTILO: evite melodrama constante, repetição, terapia artificial, declarações precoces e fazer todo assunto voltar ao trauma. NPCs podem iniciar ações plausíveis. Faça cenas avançarem.`;
 
 const OPENING=`O fim da tarde tingia as muralhas de Sunagakure de cobre quando os guardas anunciaram um viajante sem identificação de aldeia. Gaara estava próximo aos portões depois de uma inspeção, a cabaça às costas e relatórios sob um dos braços.
@@ -143,7 +155,7 @@ async function intelligence(){
  let tr=current.messages.slice(-10).map(x=>(x.role==="user"?"SARUTO":"GAARA")+": "+compactText(x.content,900)).join("\n");
  let p=`Analise o RPG abaixo de modo CONSERVADOR. Não invente fatos. JSON:
 {"memory":null|{"text":string,"type":"vínculo|revelação|promessa|conflito|preferência|evento|geral","importance":1..5,"tags":[string],"characters":["gaara"|"temari"|"kankuro"|"matatabi"]},"relationship":{"familiarity":-2..2,"trust":-2..2,"openness":-2..2,"attraction":-2..2,"intimacy":-2..2},"state":string|null,"emotion":{"state":string,"intensity":0..100,"cause":string},"world":{"time":string|null,"location":string|null,"weather":string|null,"situation":string|null,"advance_day":false},"new_event":null|string,"resolved_events":[],"milestone":null|string,"learned":[],"npc":{"temari":{"familiarity":-1..1,"trust":-1..1,"memory":null|string},"kankuro":{"familiarity":-1..1,"trust":-1..1,"memory":null|string},"matatabi":{"memory":null|string}}}
-"learned" é lista de {"fact":texto EXATO de um fato já existente,"character":"gaara|temari|kankuro"} somente se a pessoa realmente aprendeu isso na cena. Não marque atração/marcos por simples olhar ou coincidência. Não faça o tempo avançar demais.
+"learned" é lista de {"fact":texto EXATO de um fato já existente,"character":"gaara|temari|kankuro"} somente se a pessoa realmente aprendeu isso na cena. Não marque atração/marcos por simples olhar ou coincidência. Beijos, abraços, carinho ou iniciativa romântica podem justificar mudanças pequenas em atração, abertura ou intimidade quando forem emocionalmente significativos, mas nunca obrigam aumento automático. Não faça o tempo avançar demais.
 TRECHO:\n${tr}`;
  try{let a=await jsonAnalysis(p);if(a.memory){
  const nm=normalizeMemory(a.memory);
