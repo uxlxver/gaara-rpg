@@ -2,42 +2,54 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#15110f">
+<meta name="theme-color" content="#130f0e"><meta name="apple-mobile-web-app-capable" content="yes">
 <title>Gaara RPG</title>
-<link rel="manifest" href="./manifest.webmanifest"><link rel="stylesheet" href="./style.css">
+<link rel="manifest" href="./manifest.webmanifest"><link rel="stylesheet" href="./style.css?v=3">
 </head>
 <body>
+<div class="sandGlow"></div>
 <div id="app">
-<header><div><b>GAARA RPG</b><small id="scene">Sem história aberta</small></div><button id="menuBtn">☰</button></header>
+<header>
+  <div class="identity">
+    <div class="seal">愛</div>
+    <div><b>GAARA</b><small id="scene">Sem história aberta</small></div>
+  </div>
+  <button id="menuBtn" class="iconBtn" aria-label="Menu">☰</button>
+</header>
 <main id="chat"></main>
-<div id="typing" hidden>Gaara está respondendo…</div>
+<div id="typing" hidden><span></span><span></span><span></span> Gaara está respondendo</div>
+<div class="quick"><button id="continueBtn">✦ Continuar cena</button><button id="intelBtn">◇ Inteligência</button></div>
 <section class="composer">
   <textarea id="input" rows="1" placeholder="Escreva como Saruto…"></textarea>
-  <button id="send">➤</button>
+  <button id="send" aria-label="Enviar">➤</button>
 </section>
 <nav>
- <button data-tab="chat" class="active">Chat</button><button data-tab="memory">Memória</button>
- <button data-tab="world">Mundo</button><button data-tab="journal">Diário</button>
+ <button data-tab="chat" class="active"><i>◉</i><span>Chat</span></button>
+ <button data-tab="memory"><i>✧</i><span>Memória</span></button>
+ <button data-tab="world"><i>⌖</i><span>Mundo</span></button>
+ <button data-tab="journal"><i>▤</i><span>Diário</span></button>
 </nav>
 </div>
-
-<dialog id="panel"><div class="panelHead"><b id="panelTitle"></b><button id="closePanel">✕</button></div><div id="panelBody"></div></dialog>
-<dialog id="menu"><div class="panelHead"><b>Gaara RPG</b><button id="closeMenu">✕</button></div><div class="menuGrid">
-<button id="newSave">Nova história</button><button id="switchSave">Trocar história</button>
-<button id="settings">Configurações</button><button id="searchBtn">Buscar</button>
-<button id="exportBtn">Exportar save</button><label class="button">Importar save<input id="importFile" type="file" accept=".json" hidden></label>
-<button id="clearBtn" class="danger">Apagar história</button>
+<dialog id="panel"><div class="panelHead"><div><small>GAARA RPG</small><b id="panelTitle"></b></div><button id="closePanel" class="iconBtn">✕</button></div><div id="panelBody"></div></dialog>
+<dialog id="menu"><div class="panelHead"><div><small>MENU</small><b>Gaara RPG</b></div><button id="closeMenu" class="iconBtn">✕</button></div><div class="menuGrid">
+<button id="newSave"><i>＋</i><span><b>Nova história</b><small>Começar outro universo</small></span></button>
+<button id="switchSave"><i>◫</i><span><b>Trocar história</b><small>Abrir outro save</small></span></button>
+<button id="settings"><i>⚙</i><span><b>Configurações</b><small>Groq e geração</small></span></button>
+<button id="searchBtn"><i>⌕</i><span><b>Buscar</b><small>Encontrar cenas antigas</small></span></button>
+<button id="recapBtn"><i>↺</i><span><b>Recap</b><small>Relembrar a história</small></span></button>
+<button id="exportBtn"><i>⇩</i><span><b>Exportar save</b><small>Backup em JSON</small></span></button>
+<label class="button import"><i>⇧</i><span><b>Importar save</b><small>Restaurar backup</small></span><input id="importFile" type="file" accept=".json" hidden></label>
+<button id="clearBtn" class="danger"><i>×</i><span><b>Apagar história</b><small>Excluir este universo</small></span></button>
 </div></dialog>
-
-<dialog id="setup"><div class="panelHead"><b>Configuração</b><button id="closeSetup">✕</button></div>
+<dialog id="setup"><div class="panelHead"><div><small>IA</small><b>Configuração</b></div><button id="closeSetup" class="iconBtn">✕</button></div>
 <div class="form">
-<label>Groq API Key<input id="apiKey" type="password" placeholder="gsk_…"></label>
-<p class="warning">A chave fica somente neste navegador. Em GitHub Pages ela necessariamente é usada pelo navegador; use uma chave exclusiva para este RPG e revogue-a se o aparelho for perdido.</p>
-<label>Modelo<input id="model" value="openai/gpt-oss-120b"></label>
-<label>Temperatura<input id="temperature" type="number" min="0" max="2" step=".1" value=".85"></label>
-<label>Máx. tokens<input id="maxTokens" type="number" min="200" max="8000" value="1200"></label>
-<label>Mensagens recentes<input id="contextCount" type="number" min="8" max="80" value="32"></label>
-<button id="testGroq">Testar Groq</button><button id="saveSettings">Salvar</button><div id="testResult"></div>
+<label><span>Groq API Key</span><input id="apiKey" type="password" placeholder="gsk_…"></label>
+<p class="warning">A chave fica somente neste navegador. Use uma chave exclusiva para este RPG.</p>
+<div class="formGrid"><label><span>Modelo</span><input id="model" value="openai/gpt-oss-120b"></label>
+<label><span>Temperatura</span><input id="temperature" type="number" min="0" max="2" step=".1" value=".85"></label>
+<label><span>Máx. tokens</span><input id="maxTokens" type="number" min="200" max="8000" value="1400"></label>
+<label><span>Contexto recente</span><input id="contextCount" type="number" min="8" max="80" value="36"></label></div>
+<div class="setupActions"><button id="testGroq">Testar conexão</button><button id="saveSettings" class="primary">Salvar</button></div><div id="testResult"></div>
 </div></dialog>
-<script src="./app.js?v=1"></script>
+<script src="./app.js?v=3"></script>
 </body></html>
